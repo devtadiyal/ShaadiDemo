@@ -1,7 +1,8 @@
 package com.example.medcords
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -17,12 +18,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.medcords.db.AppDatabase
 import com.example.medcords.internal.*
-import com.example.medcords.model.Result
 import com.example.medcords.network.Resource
-import com.example.medcords.utils.toast
 import com.example.medcords.viewmodel.AuthViewModelFactory
 import com.example.medcords.viewmodel.HomeViewModel
 import com.example.medcords.viewmodel.UserModelFactory
@@ -62,11 +60,35 @@ class MainActivity : AppCompatActivity(), CardStackListener, KodeinAware {
         homeViewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
         viewModel = ViewModelProvider(this, factory2).get(UserViewModel::class.java)
 
-        //call random photo api method
-        getRandomPhoto()
+        if(isConnectedToInternet(this)){
+            //call random photo api method
+            getRandomPhoto()
+        }else{
+            Toast.makeText(this, getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
+        }
+
+
         setupButton()
     }
 
+    fun isConnectedToInternet(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnectedOrConnecting
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if(isConnectedToInternet(this)){
+            //call random photo api method
+            //getRandomPhoto()
+        }else{
+            createSpots()
+        }
+
+    }
 
     //method to get random photo response from viewmodel and load image url in glide
     private fun getRandomPhoto() {
@@ -157,7 +179,8 @@ class MainActivity : AppCompatActivity(), CardStackListener, KodeinAware {
     }
 
     private fun rejectUserSaveInDB(){
-        var spot = Spot(resultList.get(pos).id,
+        var spot = Spot(
+            resultList.get(pos).id,
             resultList.get(pos).name,
             resultList.get(pos).city,
             resultList.get(pos).url,
@@ -211,7 +234,8 @@ class MainActivity : AppCompatActivity(), CardStackListener, KodeinAware {
     }
 
     private fun acceptUserSaveInDB() {
-        var spot = Spot(resultList.get(pos).id,
+        var spot = Spot(
+            resultList.get(pos).id,
             resultList.get(pos).name,
             resultList.get(pos).city,
             resultList.get(pos).url,
@@ -354,11 +378,11 @@ class MainActivity : AppCompatActivity(), CardStackListener, KodeinAware {
     private fun createSpot(): Spot {
         //Default
         return Spot(
-            name = "Yasaka Shrine",
-            city = "Kyoto",
+            name = "Dev tadiyal",
+            city = "Delhi",
             url = "https://source.unsplash.com/Xq1ntWruZQI/600x800",
-            accept = "A",
-            reject = "R"
+            accept = "Accept",
+            reject = "Reject"
         )
     }
 
