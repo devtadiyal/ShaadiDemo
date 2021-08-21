@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity(), CardStackListener, KodeinAware {
 
     override fun onCardAppeared(view: View, position: Int) {
         val textView = view.findViewById<TextView>(R.id.item_name)
-            toast(resultList.get(position).id.toString())
+          //  toast(resultList.get(position).id.toString())
         pos = position
         Log.d("CardStackView", "onCardAppeared: ($position) ${textView.text}")
     }
